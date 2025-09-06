@@ -1,22 +1,15 @@
-# 🍹 Cocktail Machine - Deployment Repository
+# 🍹 Cocktail Machine - Production Release
 
-**Automated deployment releases for Raspberry Pi installations**
-
-This repository contains built, ready-to-deploy packages for the Cocktail Machine system.
-
-## 📦 What's Inside
-
-- **`web/`** - Built dashboard web application
-- **`scripts/`** - Installation and update scripts  
-- **`kiosk/`** - Kiosk mode configuration files
-- **`web/versions.json`** - Version information for update system
+**Latest Version:** `v2025.09.06-major-4e92ec3`  
+**Release Type:** major  
+**Released:** 2025-09-06T23:42:14Z  
+**From Dev Repo:** [sebastienlepoder/cocktail-machine](https://github.com/sebastienlepoder/cocktail-machine)
 
 ## 🚀 For Pi Users
 
 ### Quick Installation
 ```bash
-# Download and run the installation script
-curl -fsSL https://raw.githubusercontent.com/sebastienlepoder/cocktail-deploy/main/scripts/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/sebastienlepoder/cocktail-deploy/main/scripts/setup-ultimate.sh | bash
 ```
 
 ### Update Your System
@@ -28,23 +21,26 @@ curl -fsSL https://raw.githubusercontent.com/sebastienlepoder/cocktail-deploy/ma
 sudo /opt/scripts/update_dashboard.sh
 ```
 
+## 📋 Release Notes
+
+Latest features and improvements
+
 ## 🔄 Update Methods
 
-1. **Node-RED Dashboard** - Easy web interface
+1. **Node-RED Dashboard** - Easy web interface at `http://pi-ip:1880/ui`
 2. **API Endpoint** - `curl -X POST http://pi-ip:1880/api/update/now`  
 3. **Update Script** - `sudo /opt/scripts/update_dashboard.sh`
 4. **Quick Update** - `sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/sebastienlepoder/cocktail-deploy/main/scripts/quick-update.sh)"`
 5. **Manual Start** - `cd ~/cocktail-machine/deployment && ./start-services.sh`
 
-## 📋 Current Version
+## 📦 Contents
 
-Check `web/versions.json` for the latest version information.
-
-## 🔗 Related Repositories
-
-- **[warp-cocktail-machine](https://github.com/sebastienlepoder/warp-cocktail-machine)** - Main development repository
-- **[cocktail-machine](https://github.com/sebastienlepoder/cocktail-machine)** - Legacy repository
+- **`web/`** - Dashboard application (version v2025.09.06-major-4e92ec3)
+- **`scripts/`** - Installation and update scripts  
+- **`kiosk/`** - Kiosk mode configuration
+- **`web.tar.gz`** - Compressed deployment archive
 
 ---
 
-*This repository is automatically updated via GitHub Actions when new releases are built.*
+*🤖 Automatically deployed from dev repository via GitHub Actions*  
+*⏰ Last updated: 2025-09-06T23:42:14Z*
