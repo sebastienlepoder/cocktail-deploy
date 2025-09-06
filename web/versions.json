@@ -1,40 +1,25 @@
 {
   "dashboard": {
-    "latest": "v1.0.0",
+    "latest": "v2025.09.06-41ecda0",
     "artifact": "web.tar.gz",
     "notes": [
-      "Initial release of the cocktail machine dashboard",
-      "Complete Pi kiosk setup with auto-login",
-      "Node-RED integration with MQTT communication",
-      "ESP32 module support and management",
-      "Built-in update system via web interface"
+      "Updated dashboard from commit 41ecda0",
+      "Built on 2025-09-06T23:19:54Z",
+      "Latest features and improvements"
     ]
   },
   "modules": {
     "latest": "v1.0.0",
     "notes": [
-      "ESP32 bottle module firmware",
-      "MQTT communication protocol",
-      "Pump control and liquid level sensing",
-      "Auto-registration with master system"
+      "Stable bottle module firmware",
+      "MQTT communication protocol"
     ]
   },
   "backend": {
     "latest": "v1.0.0", 
     "notes": [
       "Node-RED cocktail control flow",
-      "MQTT broker configuration",
-      "Dashboard API endpoints",
-      "Module management system"
+      "MQTT broker and dashboard API"
     ]
-  },
-  "system": {
-    "update_frequency": "weekly",
-    "last_updated": "2024-12-15T22:00:00Z",
-    "compatibility": {
-      "pi_os": "Bookworm (64-bit)",
-      "node_red": ">=3.0.0",
-      "docker": ">=20.0.0"
-    }
   }
 }
