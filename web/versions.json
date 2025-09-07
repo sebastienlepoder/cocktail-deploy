@@ -1,12 +1,12 @@
 {
   "dashboard": {
-    "latest": "v2025.09.07-0704-3a54114",
+    "latest": "v2025.09.07-patch-fea38fb",
     "artifact": "web.tar.gz",
     "notes": [
-      "MAJOR CHANGE v1.0.1: Headless web-only approach - eliminates all X11/desktop issues",
-      "Released on 2025-09-07T07:04:19Z",
-      "Built from dev commit 3a54114",
-      "Release type: minor"
+      "v1.0.2: Add simple Pi screen display - minimal X11 approach for kiosk browser",
+      "Released on 2025-09-07T07:15:49Z",
+      "Built from dev commit fea38fb",
+      "Release type: patch"
     ]
   },
   "modules": {
@@ -26,9 +26,9 @@
     ]
   },
   "release": {
-    "type": "minor",
-    "timestamp": "2025-09-07T07:04:19Z",
+    "type": "patch",
+    "timestamp": "2025-09-07T07:15:49Z",
     "dev_repo": "sebastienlepoder/cocktail-machine",
-    "dev_commit": "3a54114a306f03e3c4b63c88ffd24275ca7d1351"
+    "dev_commit": "fea38fbd8af9849d34ee2a5e59551b0d7c3c2dbb"
   }
 }

@@ -1,8 +1,8 @@
 # 🍹 Cocktail Machine - Production Release
 
-**Latest Version:** `v2025.09.07-0704-3a54114`  
-**Release Type:** minor  
-**Released:** 2025-09-07T07:04:19Z  
+**Latest Version:** `v2025.09.07-patch-fea38fb`  
+**Release Type:** patch  
+**Released:** 2025-09-07T07:15:49Z  
 **From Dev Repo:** [sebastienlepoder/cocktail-machine](https://github.com/sebastienlepoder/cocktail-machine)
 
 ## 🚀 For Pi Users
@@ -23,7 +23,7 @@ sudo /opt/scripts/update_dashboard.sh
 
 ## 📋 Release Notes
 
-MAJOR CHANGE v1.0.1: Headless web-only approach - eliminates all X11/desktop issues
+v1.0.2: Add simple Pi screen display - minimal X11 approach for kiosk browser
 
 ## 🔄 Update Methods
 
@@ -35,7 +35,7 @@ MAJOR CHANGE v1.0.1: Headless web-only approach - eliminates all X11/desktop iss
 
 ## 📦 Contents
 
-- **`web/`** - Dashboard application (version v2025.09.07-0704-3a54114)
+- **`web/`** - Dashboard application (version v2025.09.07-patch-fea38fb)
 - **`scripts/`** - Installation and update scripts  
 - **`kiosk/`** - Kiosk mode configuration
 - **`web.tar.gz`** - Compressed deployment archive
@@ -43,4 +43,4 @@ MAJOR CHANGE v1.0.1: Headless web-only approach - eliminates all X11/desktop iss
 ---
 
 *🤖 Automatically deployed from dev repository via GitHub Actions*  
-*⏰ Last updated: 2025-09-07T07:04:19Z*
+*⏰ Last updated: 2025-09-07T07:15:49Z*
