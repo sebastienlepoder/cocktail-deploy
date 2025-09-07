@@ -1,25 +1,34 @@
 {
   "dashboard": {
-    "latest": "v2025.09.07-7bc487c",
+    "latest": "v2025.09.07-major-7bc487c",
     "artifact": "web.tar.gz",
     "notes": [
-      "Updated dashboard from commit 7bc487c",
-      "Built on 2025-09-07T04:02:50Z",
-      "Latest features and improvements"
+      "🎉 COMPLETE SYSTEM REWRITE! Fresh Pi installations now download your React dashboard directly from production. No more old Next.js dashboard! Setup script completely rewritten to use production repo, correct Docker config, working kiosk mode. This is a MAJOR update - fresh installs will work perfectly out of the box.",
+      "Released on 2025-09-07T04:02:12Z",
+      "Built from dev commit 7bc487c",
+      "Release type: major"
     ]
   },
   "modules": {
     "latest": "v1.0.0",
     "notes": [
-      "Stable bottle module firmware",
-      "MQTT communication protocol"
+      "ESP32 bottle module firmware",
+      "MQTT communication protocol",
+      "Pump control and liquid level sensing"
     ]
   },
   "backend": {
     "latest": "v1.0.0", 
     "notes": [
       "Node-RED cocktail control flow",
-      "MQTT broker and dashboard API"
+      "MQTT broker and dashboard API",
+      "Module management system"
     ]
+  },
+  "release": {
+    "type": "major",
+    "timestamp": "2025-09-07T04:02:12Z",
+    "dev_repo": "sebastienlepoder/cocktail-machine",
+    "dev_commit": "7bc487ccbb95b56be0a95ef8db5b81367847541c"
   }
 }

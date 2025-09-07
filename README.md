@@ -1,8 +1,8 @@
 # 🍹 Cocktail Machine - Production Release
 
-**Latest Version:** `v2025.09.07-0342-aea5624`  
-**Release Type:** minor  
-**Released:** 2025-09-07T03:42:04Z  
+**Latest Version:** `v2025.09.07-major-7bc487c`  
+**Release Type:** major  
+**Released:** 2025-09-07T04:02:12Z  
 **From Dev Repo:** [sebastienlepoder/cocktail-machine](https://github.com/sebastienlepoder/cocktail-machine)
 
 ## 🚀 For Pi Users
@@ -23,7 +23,7 @@ sudo /opt/scripts/update_dashboard.sh
 
 ## 📋 Release Notes
 
-🎉 COMPLETE SYSTEM WORKING! Fixed all Pi kiosk and update issues. React dashboard displays correctly on Pi screen, update system works with Docker containers, service health checks fixed. All deployment scripts updated and tested.
+🎉 COMPLETE SYSTEM REWRITE! Fresh Pi installations now download your React dashboard directly from production. No more old Next.js dashboard! Setup script completely rewritten to use production repo, correct Docker config, working kiosk mode. This is a MAJOR update - fresh installs will work perfectly out of the box.
 
 ## 🔄 Update Methods
 
@@ -35,7 +35,7 @@ sudo /opt/scripts/update_dashboard.sh
 
 ## 📦 Contents
 
-- **`web/`** - Dashboard application (version v2025.09.07-0342-aea5624)
+- **`web/`** - Dashboard application (version v2025.09.07-major-7bc487c)
 - **`scripts/`** - Installation and update scripts  
 - **`kiosk/`** - Kiosk mode configuration
 - **`web.tar.gz`** - Compressed deployment archive
@@ -43,4 +43,4 @@ sudo /opt/scripts/update_dashboard.sh
 ---
 
 *🤖 Automatically deployed from dev repository via GitHub Actions*  
-*⏰ Last updated: 2025-09-07T03:42:04Z*
+*⏰ Last updated: 2025-09-07T04:02:12Z*
