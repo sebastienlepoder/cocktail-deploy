@@ -1,12 +1,12 @@
 {
   "dashboard": {
-    "latest": "v2025.09.07-patch-418ed09",
+    "latest": "v2025.09.07-0704-3a54114",
     "artifact": "web.tar.gz",
     "notes": [
-      "Add version tracking v1.0.0 - enables script version verification",
-      "Released on 2025-09-07T06:49:10Z",
-      "Built from dev commit 418ed09",
-      "Release type: patch"
+      "MAJOR CHANGE v1.0.1: Headless web-only approach - eliminates all X11/desktop issues",
+      "Released on 2025-09-07T07:04:19Z",
+      "Built from dev commit 3a54114",
+      "Release type: minor"
     ]
   },
   "modules": {
@@ -26,9 +26,9 @@
     ]
   },
   "release": {
-    "type": "patch",
-    "timestamp": "2025-09-07T06:49:10Z",
+    "type": "minor",
+    "timestamp": "2025-09-07T07:04:19Z",
     "dev_repo": "sebastienlepoder/cocktail-machine",
-    "dev_commit": "418ed0950d4aa49f3670315258240aea84f852ba"
+    "dev_commit": "3a54114a306f03e3c4b63c88ffd24275ca7d1351"
   }
 }
