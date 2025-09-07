@@ -1,11 +1,11 @@
 {
   "dashboard": {
-    "latest": "v2025.09.07-patch-574b7ee",
+    "latest": "v2025.09.07-patch-21c42c2",
     "artifact": "web.tar.gz",
     "notes": [
-      "Latest features and improvements",
-      "Released on 2025-09-07T02:38:35Z",
-      "Built from dev commit 574b7ee",
+      "Updated script copies to Docker and fixes Pi kiosk display",
+      "Released on 2025-09-07T03:31:48Z",
+      "Built from dev commit 21c42c2",
       "Release type: patch"
     ]
   },
@@ -27,8 +27,8 @@
   },
   "release": {
     "type": "patch",
-    "timestamp": "2025-09-07T02:38:35Z",
+    "timestamp": "2025-09-07T03:31:48Z",
     "dev_repo": "sebastienlepoder/cocktail-machine",
-    "dev_commit": "574b7ee0b63b4d257c83f1d857e1ec76a6d22a31"
+    "dev_commit": "21c42c2a6c186719c5796377d41df12127d4f3a7"
   }
 }
