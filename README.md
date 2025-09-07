@@ -1,8 +1,8 @@
 # 🍹 Cocktail Machine - Production Release
 
-**Latest Version:** `v2025.09.07-patch-aea4765`  
+**Latest Version:** `v2025.09.07-patch-418ed09`  
 **Release Type:** patch  
-**Released:** 2025-09-07T06:25:10Z  
+**Released:** 2025-09-07T06:49:10Z  
 **From Dev Repo:** [sebastienlepoder/cocktail-machine](https://github.com/sebastienlepoder/cocktail-machine)
 
 ## 🚀 For Pi Users
@@ -23,7 +23,7 @@ sudo /opt/scripts/update_dashboard.sh
 
 ## 📋 Release Notes
 
-Clean deployment with X11 fixes and no workflow conflicts
+Add version tracking v1.0.0 - enables script version verification
 
 ## 🔄 Update Methods
 
@@ -35,7 +35,7 @@ Clean deployment with X11 fixes and no workflow conflicts
 
 ## 📦 Contents
 
-- **`web/`** - Dashboard application (version v2025.09.07-patch-aea4765)
+- **`web/`** - Dashboard application (version v2025.09.07-patch-418ed09)
 - **`scripts/`** - Installation and update scripts  
 - **`kiosk/`** - Kiosk mode configuration
 - **`web.tar.gz`** - Compressed deployment archive
@@ -43,4 +43,4 @@ Clean deployment with X11 fixes and no workflow conflicts
 ---
 
 *🤖 Automatically deployed from dev repository via GitHub Actions*  
-*⏰ Last updated: 2025-09-07T06:25:10Z*
+*⏰ Last updated: 2025-09-07T06:49:10Z*

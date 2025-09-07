@@ -1,11 +1,11 @@
 {
   "dashboard": {
-    "latest": "v2025.09.07-patch-aea4765",
+    "latest": "v2025.09.07-patch-418ed09",
     "artifact": "web.tar.gz",
     "notes": [
-      "Clean deployment with X11 fixes and no workflow conflicts",
-      "Released on 2025-09-07T06:25:10Z",
-      "Built from dev commit aea4765",
+      "Add version tracking v1.0.0 - enables script version verification",
+      "Released on 2025-09-07T06:49:10Z",
+      "Built from dev commit 418ed09",
       "Release type: patch"
     ]
   },
@@ -27,8 +27,8 @@
   },
   "release": {
     "type": "patch",
-    "timestamp": "2025-09-07T06:25:10Z",
+    "timestamp": "2025-09-07T06:49:10Z",
     "dev_repo": "sebastienlepoder/cocktail-machine",
-    "dev_commit": "aea4765715e043abf2aa891e30a7346d366d4aa8"
+    "dev_commit": "418ed0950d4aa49f3670315258240aea84f852ba"
   }
 }
