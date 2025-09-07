@@ -1,11 +1,11 @@
 {
   "dashboard": {
-    "latest": "v2025.09.07-patch-fea38fb",
+    "latest": "v2025.09.07-patch-f2f2b22",
     "artifact": "web.tar.gz",
     "notes": [
-      "v1.0.2: Add simple Pi screen display - minimal X11 approach for kiosk browser",
-      "Released on 2025-09-07T07:15:49Z",
-      "Built from dev commit fea38fb",
+      "v1.0.3: Fix X11 console permissions - should resolve tty0 access denied error",
+      "Released on 2025-09-07T20:27:13Z",
+      "Built from dev commit f2f2b22",
       "Release type: patch"
     ]
   },
@@ -27,8 +27,8 @@
   },
   "release": {
     "type": "patch",
-    "timestamp": "2025-09-07T07:15:49Z",
+    "timestamp": "2025-09-07T20:27:13Z",
     "dev_repo": "sebastienlepoder/cocktail-machine",
-    "dev_commit": "fea38fbd8af9849d34ee2a5e59551b0d7c3c2dbb"
+    "dev_commit": "f2f2b22263b134157f4fe51cfafd46d87bdef298"
   }
 }
