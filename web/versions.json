@@ -1,10 +1,10 @@
 {
   "dashboard": {
-    "latest": "v2025.09.07-c951816",
+    "latest": "v2025.09.07-0706ac8",
     "artifact": "web.tar.gz",
     "notes": [
-      "Updated dashboard from commit c951816",
-      "Built on 2025-09-07T04:59:41Z",
+      "Updated dashboard from commit 0706ac8",
+      "Built on 2025-09-07T05:03:32Z",
       "Latest features and improvements"
     ]
   },
