@@ -1,15 +1,15 @@
 # 🍹 Cocktail Machine - Production Release
 
-**Latest Version:** `v2025.09.07-2038-2321547`  
+**Latest Version:** `v2025.09.07-2234-eb9c4e5`  
 **Release Type:** minor  
-**Released:** 2025-09-07T20:38:17Z  
-**From Dev Repo:** [sebastienlepoder/cocktail-machine](https://github.com/sebastienlepoder/cocktail-machine)
+**Released:** 2025-09-07T22:34:54Z  
+**From Dev Repo:** [sebastienlepoder/cocktail-machine-dev](https://github.com/sebastienlepoder/cocktail-machine-dev)
 
 ## 🚀 For Pi Users
 
 ### Quick Installation
 ```bash
-curl -fsSL https://raw.githubusercontent.com/sebastienlepoder/cocktail-deploy/main/scripts/setup-ultimate.sh | bash
+curl -fsSL https://raw.githubusercontent.com/sebastienlepoder/cocktail-machine-prod/main/scripts/setup-ultimate.sh | bash
 ```
 
 ### Update Your System
@@ -30,12 +30,13 @@ Latest features and improvements
 1. **Node-RED Dashboard** - Easy web interface at `http://pi-ip:1880/ui`
 2. **API Endpoint** - `curl -X POST http://pi-ip:1880/api/update/now`  
 3. **Update Script** - `sudo /opt/scripts/update_dashboard.sh`
-4. **Quick Update** - `sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/sebastienlepoder/cocktail-deploy/main/scripts/quick-update.sh)"`
-5. **Manual Start** - `cd ~/cocktail-machine/deployment && ./start-services.sh`
+4. **Quick Update** - `sudo bash -c "$(curl -fsSL https://raw.githubusercontent.com/sebastienlepoder/cocktail-machine-prod/main/scripts/quick-update.sh)"`
+5. **Manual Start** - `cd ~/cocktail-machine-dev/deployment && ./start-services.sh`
 
 ## 📦 Contents
 
-- **`web/`** - Dashboard application (version v2025.09.07-2038-2321547)
+- **`web/`** - Dashboard application (version v2025.09.07-2234-eb9c4e5)
+- **`nodered/`** - Node-RED flows and configuration
 - **`scripts/`** - Installation and update scripts  
 - **`kiosk/`** - Kiosk mode configuration
 - **`web.tar.gz`** - Compressed deployment archive
@@ -43,4 +44,4 @@ Latest features and improvements
 ---
 
 *🤖 Automatically deployed from dev repository via GitHub Actions*  
-*⏰ Last updated: 2025-09-07T20:38:17Z*
+*⏰ Last updated: 2025-09-07T22:34:54Z*

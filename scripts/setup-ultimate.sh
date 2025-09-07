@@ -25,7 +25,7 @@ print_info() { echo -e "${YELLOW}ℹ${NC} $1"; }
 print_step() { echo -e "${BLUE}►${NC} $1"; }
 
 # Configuration
-DEPLOY_REPO="sebastienlepoder/cocktail-deploy"
+DEPLOY_REPO="sebastienlepoder/cocktail-machine-prod"
 BRANCH="main"
 WEBROOT_DIR="/opt/webroot"
 SCRIPTS_DIR="/opt/scripts"
@@ -400,7 +400,7 @@ print_step "Step 6: Configuring nginx..."
 sudo mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled
 
 # Create nginx config for React dashboard
-sudo tee /etc/nginx/sites-available/cocktail-machine > /dev/null << EOF
+sudo tee /etc/nginx/sites-available/cocktail-machine-dev > /dev/null << EOF
 server {
     listen 80;
     server_name _;
@@ -426,7 +426,7 @@ server {
 EOF
 
 # Enable the site
-sudo ln -sf /etc/nginx/sites-available/cocktail-machine /etc/nginx/sites-enabled/
+sudo ln -sf /etc/nginx/sites-available/cocktail-machine-dev /etc/nginx/sites-enabled/
 sudo rm -f /etc/nginx/sites-enabled/default
 
 # Test nginx config and restart
@@ -455,7 +455,7 @@ print_status "Nginx configuration completed"
 print_step "Step 7: Setting up backend services..."
 
 # Create project directory
-PROJECT_DIR="/home/$USER/cocktail-machine"
+PROJECT_DIR="/home/$USER/cocktail-machine-dev"
 mkdir -p "$PROJECT_DIR"
 
 # Create simple docker-compose for backend services only
@@ -474,6 +474,8 @@ services:
       - ./nodered/data:/data
     environment:
       - TZ=Europe/Paris
+      - NODE_RED_ENABLE_PROJECTS=false
+      - NODE_RED_ENABLE_SAFE_MODE=false
     networks:
       - cocktail-network
     healthcheck:
@@ -481,6 +483,7 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    command: node-red --settings /data/settings.js
 
   # MQTT Broker
   mqtt:
@@ -517,6 +520,128 @@ log_type warning
 log_type notice
 log_type information
 EOF
+
+# Step 7.5: Download and deploy Node-RED flows
+print_info "Downloading Node-RED flows..."
+
+# Download Node-RED flows from production repository
+NODERED_URL="https://raw.githubusercontent.com/$DEPLOY_REPO/$BRANCH/nodered"
+
+# Create Node-RED data directories
+mkdir -p "$PROJECT_DIR/nodered/data"
+
+# Download flows and configuration
+print_info "Fetching Node-RED flows..."
+if curl -L -f -o "$PROJECT_DIR/nodered/data/flows.json" "$NODERED_URL/flows/flows.json"; then
+    print_status "Node-RED flows downloaded successfully"
+else
+    print_error "Failed to download Node-RED flows, creating basic flow"
+    # Create a basic flow as fallback
+    cat > "$PROJECT_DIR/nodered/data/flows.json" << 'BASIC_FLOW_EOF'
+[
+  {
+    "id": "basic-flow",
+    "label": "Basic Cocktail Flow", 
+    "nodes": [
+      {
+        "id": "welcome-msg",
+        "type": "inject",
+        "z": "basic-flow",
+        "name": "Welcome",
+        "props": [{"p": "payload"}],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "Cocktail Machine Node-RED is running!",
+        "payloadType": "str",
+        "x": 100,
+        "y": 100,
+        "wires": [["debug-out"]]
+      },
+      {
+        "id": "debug-out",
+        "type": "debug",
+        "z": "basic-flow",
+        "name": "System Status",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 300,
+        "y": 100,
+        "wires": []
+      }
+    ]
+  }
+]
+BASIC_FLOW_EOF
+    print_info "Basic fallback flow created"
+fi
+
+# Download Node-RED settings
+print_info "Fetching Node-RED settings..."
+if curl -L -f -o "$PROJECT_DIR/nodered/data/settings.js" "$NODERED_URL/settings/settings.js"; then
+    print_status "Node-RED settings downloaded successfully"
+else
+    print_info "Creating default Node-RED settings"
+    # Create basic settings file
+    cat > "$PROJECT_DIR/nodered/data/settings.js" << 'SETTINGS_EOF'
+module.exports = {
+    uiPort: process.env.PORT || 1880,
+    uiHost: '0.0.0.0',
+    httpAdminRoot: '/admin',
+    httpNodeRoot: '/api',
+    userDir: '/data',
+    flowFile: 'flows.json',
+    flowFilePretty: true,
+    editorTheme: {
+        page: {
+            title: "Cocktail Machine - Node-RED",
+            favicon: "🍹"
+        },
+        header: {
+            title: "🍹 Cocktail Machine Control"
+        }
+    },
+    logging: {
+        console: {
+            level: "info",
+            metrics: false,
+            audit: false
+        }
+    }
+};
+SETTINGS_EOF
+    print_status "Default Node-RED settings created"
+fi
+
+# Download additional Node-RED modules package.json
+if curl -L -f -o "$PROJECT_DIR/nodered/data/package.json" "$NODERED_URL/settings/package.json"; then
+    print_status "Node-RED package.json downloaded"
+else
+    print_info "Creating basic package.json for Node-RED modules"
+    cat > "$PROJECT_DIR/nodered/data/package.json" << 'PACKAGE_EOF'
+{
+  "name": "cocktail-machine-nodered",
+  "version": "1.0.0",
+  "description": "Node-RED flows for Cocktail Machine",
+  "dependencies": {
+    "node-red-dashboard": "^3.6.0"
+  }
+}
+PACKAGE_EOF
+    print_status "Basic Node-RED package.json created"
+fi
+
+# Set proper permissions for Node-RED data
+sudo chown -R 1000:1000 "$PROJECT_DIR/nodered/data"
+chmod -R 755 "$PROJECT_DIR/nodered/data"
+
+print_status "Node-RED flows and configuration deployed"
 
 # Start backend services
 cd "$PROJECT_DIR"
@@ -710,10 +835,10 @@ print_status "Web-only setup completed - no desktop environment needed"
 print_step "Step 9: Creating simple kiosk startup..."
 
 # Create kiosk directory
-mkdir -p /home/$USER/.cocktail-machine
+mkdir -p /home/$USER/.cocktail-machine-dev
 
 # Create improved kiosk script
-cat > /home/$USER/.cocktail-machine/start-kiosk.sh << 'KIOSK_EOF'
+cat > /home/$USER/.cocktail-machine-dev/start-kiosk.sh << 'KIOSK_EOF'
 #!/bin/bash
 # Improved kiosk startup script with better error handling
 
@@ -800,14 +925,14 @@ while true; do
 done
 KIOSK_EOF
 
-chmod +x /home/$USER/.cocktail-machine/start-kiosk.sh
+chmod +x /home/$USER/.cocktail-machine-dev/start-kiosk.sh
 
 # Create auto-start script that runs after auto-login
 cat > /home/$USER/.bash_profile << 'PROFILE_EOF'
 # Auto-start kiosk when logging into tty1
 if [ "$(tty)" = "/dev/tty1" ] && [ -z "$DISPLAY" ]; then
     echo "Starting cocktail machine kiosk..."
-    /home/$USER/.cocktail-machine/start-kiosk.sh
+    /home/$USER/.cocktail-machine-dev/start-kiosk.sh
 fi
 PROFILE_EOF
 
@@ -887,6 +1012,22 @@ for i in {1..3}; do
     fi
 done
 
+# Test Node-RED service
+print_info "Testing Node-RED service..."
+for i in {1..5}; do
+    if curl -s http://localhost:1880 >/dev/null 2>&1; then
+        print_status "Node-RED is accessible on port 1880"
+        break
+    elif [ $i -eq 5 ]; then
+        print_info "Node-RED not accessible after 5 attempts"
+        print_info "Docker containers status:"
+        docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" 2>/dev/null || print_info "Docker not accessible"
+    else
+        print_info "Attempt $i/5: Waiting for Node-RED..."
+        sleep 3
+    fi
+done
+
 # Test update system
 print_info "Testing update system..."
 if sudo "$SCRIPTS_DIR/update_dashboard.sh" --check; then
@@ -904,7 +1045,7 @@ echo "   • Dashboard files: $([ -f /opt/webroot/index.html ] && echo 'Present'
 echo "   • Webroot permissions: $(ls -ld /opt/webroot 2>/dev/null | awk '{print $1, $3, $4}' || echo 'Not accessible')"
 echo "   • Index.html size: $([ -f /opt/webroot/index.html ] && stat -c%s /opt/webroot/index.html || echo 'N/A') bytes"
 echo "   • Nginx config test: $(sudo nginx -t 2>&1 >/dev/null && echo 'Valid' || echo 'Invalid')"
-echo "   • Kiosk scripts: $([ -f /home/$USER/.cocktail-machine/kiosk-launcher.sh ] && echo 'Present' || echo 'Missing')"
+echo "   • Kiosk scripts: $([ -f /home/$USER/.cocktail-machine-dev/kiosk-launcher.sh ] && echo 'Present' || echo 'Missing')"
 
 # Try to fix common issues
 if ! pgrep nginx >/dev/null; then
@@ -921,15 +1062,17 @@ echo "🎉 Cocktail Machine Setup Complete!"
 echo "=================================================="
 echo ""
 echo "✅ Production React dashboard installed and running"
+echo "✅ Node-RED flows deployed with update system"
 echo "✅ Nginx web server configured and started"
 echo "✅ Docker backend services configured"
 echo "✅ Update system installed and working"
 echo "✅ Simple kiosk browser configured for Pi screen"
 echo "✅ Web access enabled from network devices"
 echo ""
-echo "🌐 Access Points (from ANY device on your network):"
+echo "🌍 Access Points (from ANY device on your network):"
 echo "   • React Dashboard: http://[pi-ip-address]"
-echo "   • Node-RED:        http://[pi-ip-address]:1880"
+echo "   • Node-RED UI:     http://[pi-ip-address]:1880/ui"
+echo "   • Node-RED Admin:  http://[pi-ip-address]:1880/admin"
 echo "   • Health Check:    http://[pi-ip-address]/health"
 echo "   • System Info:     http://[pi-ip-address]/system-info.html"
 echo ""

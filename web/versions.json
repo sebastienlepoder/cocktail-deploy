@@ -1,11 +1,11 @@
 {
   "dashboard": {
-    "latest": "v2025.09.07-2038-2321547",
+    "latest": "v2025.09.07-2234-eb9c4e5",
     "artifact": "web.tar.gz",
     "notes": [
       "Latest features and improvements",
-      "Released on 2025-09-07T20:38:17Z",
-      "Built from dev commit 2321547",
+      "Released on 2025-09-07T22:34:54Z",
+      "Built from dev commit eb9c4e5",
       "Release type: minor"
     ]
   },
@@ -27,8 +27,8 @@
   },
   "release": {
     "type": "minor",
-    "timestamp": "2025-09-07T20:38:17Z",
-    "dev_repo": "sebastienlepoder/cocktail-machine",
-    "dev_commit": "23215473bdc8c6d8346272b60b3d94b558ee0e1b"
+    "timestamp": "2025-09-07T22:34:54Z",
+    "dev_repo": "sebastienlepoder/cocktail-machine-dev",
+    "dev_commit": "eb9c4e576118d4af7ad588094e79b427ed1d0a1c"
   }
 }
