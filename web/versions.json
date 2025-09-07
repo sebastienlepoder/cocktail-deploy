@@ -1,11 +1,11 @@
 {
   "dashboard": {
-    "latest": "v2025.09.07-patch-90ccdf3",
+    "latest": "v2025.09.07-patch-bf2965c",
     "artifact": "web.tar.gz",
     "notes": [
-      "Fix kiosk black screen - proper X11 authorization and browser startup",
-      "Released on 2025-09-07T05:58:07Z",
-      "Built from dev commit 90ccdf3",
+      "Fix auto-login and desktop session - should resolve X11 authorization and kiosk startup",
+      "Released on 2025-09-07T06:08:05Z",
+      "Built from dev commit bf2965c",
       "Release type: patch"
     ]
   },
@@ -27,8 +27,8 @@
   },
   "release": {
     "type": "patch",
-    "timestamp": "2025-09-07T05:58:07Z",
+    "timestamp": "2025-09-07T06:08:05Z",
     "dev_repo": "sebastienlepoder/cocktail-machine",
-    "dev_commit": "90ccdf3ec04aa50d1ea0be1ac1280a4ef1961160"
+    "dev_commit": "bf2965cbd420b578de1168a49cb3b7e61f3993a3"
   }
 }
