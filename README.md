@@ -1,8 +1,8 @@
 # 🍹 Cocktail Machine - Production Release
 
-**Latest Version:** `v2025.09.07-patch-86c9a44`  
+**Latest Version:** `v2025.09.07-patch-8ff820c`  
 **Release Type:** patch  
-**Released:** 2025-09-07T04:13:01Z  
+**Released:** 2025-09-07T05:07:14Z  
 **From Dev Repo:** [sebastienlepoder/cocktail-machine](https://github.com/sebastienlepoder/cocktail-machine)
 
 ## 🚀 For Pi Users
@@ -23,7 +23,7 @@ sudo /opt/scripts/update_dashboard.sh
 
 ## 📋 Release Notes
 
-🧹 CLEANUP: Removed all outdated setup scripts. Now only ONE setup script exists: setup-ultimate.sh. Updated all documentation. No more confusion about which script to use!
+Fix Next.js static export handling - should resolve dashboard index.html issues
 
 ## 🔄 Update Methods
 
@@ -35,7 +35,7 @@ sudo /opt/scripts/update_dashboard.sh
 
 ## 📦 Contents
 
-- **`web/`** - Dashboard application (version v2025.09.07-patch-86c9a44)
+- **`web/`** - Dashboard application (version v2025.09.07-patch-8ff820c)
 - **`scripts/`** - Installation and update scripts  
 - **`kiosk/`** - Kiosk mode configuration
 - **`web.tar.gz`** - Compressed deployment archive
@@ -43,4 +43,4 @@ sudo /opt/scripts/update_dashboard.sh
 ---
 
 *🤖 Automatically deployed from dev repository via GitHub Actions*  
-*⏰ Last updated: 2025-09-07T04:13:01Z*
+*⏰ Last updated: 2025-09-07T05:07:14Z*

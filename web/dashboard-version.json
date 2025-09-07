@@ -1,0 +1,13 @@
+{
+  "dashboard": {
+    "version": "v2025.09.07.patch-97aceca",
+    "build_date": "2025-09-07T01:28:27Z",
+    "source_commit": "97aceca",
+    "source_repo": "cocktail-slider-display",
+    "release_type": "patch",
+    "release_notes": "Testing web dashboard deployment workflow",
+    "built_by": "GitHub Actions",
+    "node_version": "v18.20.8",
+    "npm_version": "10.8.2"
+  }
+}
