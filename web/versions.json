@@ -1,12 +1,12 @@
 {
   "dashboard": {
-    "latest": "v2025.09.07-patch-f2f2b22",
+    "latest": "v2025.09.07-2038-2321547",
     "artifact": "web.tar.gz",
     "notes": [
-      "v1.0.3: Fix X11 console permissions - should resolve tty0 access denied error",
-      "Released on 2025-09-07T20:27:13Z",
-      "Built from dev commit f2f2b22",
-      "Release type: patch"
+      "Latest features and improvements",
+      "Released on 2025-09-07T20:38:17Z",
+      "Built from dev commit 2321547",
+      "Release type: minor"
     ]
   },
   "modules": {
@@ -26,9 +26,9 @@
     ]
   },
   "release": {
-    "type": "patch",
-    "timestamp": "2025-09-07T20:27:13Z",
+    "type": "minor",
+    "timestamp": "2025-09-07T20:38:17Z",
     "dev_repo": "sebastienlepoder/cocktail-machine",
-    "dev_commit": "f2f2b22263b134157f4fe51cfafd46d87bdef298"
+    "dev_commit": "23215473bdc8c6d8346272b60b3d94b558ee0e1b"
   }
 }

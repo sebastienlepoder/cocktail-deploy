@@ -1,8 +1,8 @@
 # 🍹 Cocktail Machine - Production Release
 
-**Latest Version:** `v2025.09.07-patch-f2f2b22`  
-**Release Type:** patch  
-**Released:** 2025-09-07T20:27:13Z  
+**Latest Version:** `v2025.09.07-2038-2321547`  
+**Release Type:** minor  
+**Released:** 2025-09-07T20:38:17Z  
 **From Dev Repo:** [sebastienlepoder/cocktail-machine](https://github.com/sebastienlepoder/cocktail-machine)
 
 ## 🚀 For Pi Users
@@ -23,7 +23,7 @@ sudo /opt/scripts/update_dashboard.sh
 
 ## 📋 Release Notes
 
-v1.0.3: Fix X11 console permissions - should resolve tty0 access denied error
+Latest features and improvements
 
 ## 🔄 Update Methods
 
@@ -35,7 +35,7 @@ v1.0.3: Fix X11 console permissions - should resolve tty0 access denied error
 
 ## 📦 Contents
 
-- **`web/`** - Dashboard application (version v2025.09.07-patch-f2f2b22)
+- **`web/`** - Dashboard application (version v2025.09.07-2038-2321547)
 - **`scripts/`** - Installation and update scripts  
 - **`kiosk/`** - Kiosk mode configuration
 - **`web.tar.gz`** - Compressed deployment archive
@@ -43,4 +43,4 @@ v1.0.3: Fix X11 console permissions - should resolve tty0 access denied error
 ---
 
 *🤖 Automatically deployed from dev repository via GitHub Actions*  
-*⏰ Last updated: 2025-09-07T20:27:13Z*
+*⏰ Last updated: 2025-09-07T20:38:17Z*
