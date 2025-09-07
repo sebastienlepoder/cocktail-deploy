@@ -1,8 +1,8 @@
 # 🍹 Cocktail Machine - Production Release
 
-**Latest Version:** `v2025.09.06-major-4e92ec3`  
-**Release Type:** major  
-**Released:** 2025-09-06T23:42:14Z  
+**Latest Version:** `v2025.09.07-patch-574b7ee`  
+**Release Type:** patch  
+**Released:** 2025-09-07T02:10:20Z  
 **From Dev Repo:** [sebastienlepoder/cocktail-machine](https://github.com/sebastienlepoder/cocktail-machine)
 
 ## 🚀 For Pi Users
@@ -23,7 +23,7 @@ sudo /opt/scripts/update_dashboard.sh
 
 ## 📋 Release Notes
 
-Latest features and improvements
+Add missing update scripts - fixes Node-RED dashboard update button error
 
 ## 🔄 Update Methods
 
@@ -35,7 +35,7 @@ Latest features and improvements
 
 ## 📦 Contents
 
-- **`web/`** - Dashboard application (version v2025.09.06-major-4e92ec3)
+- **`web/`** - Dashboard application (version v2025.09.07-patch-574b7ee)
 - **`scripts/`** - Installation and update scripts  
 - **`kiosk/`** - Kiosk mode configuration
 - **`web.tar.gz`** - Compressed deployment archive
@@ -43,4 +43,4 @@ Latest features and improvements
 ---
 
 *🤖 Automatically deployed from dev repository via GitHub Actions*  
-*⏰ Last updated: 2025-09-06T23:42:14Z*
+*⏰ Last updated: 2025-09-07T02:10:20Z*
