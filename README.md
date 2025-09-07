@@ -1,8 +1,8 @@
 # 🍹 Cocktail Machine - Production Release
 
-**Latest Version:** `v2025.09.07-patch-8ff820c`  
+**Latest Version:** `v2025.09.07-patch-90ccdf3`  
 **Release Type:** patch  
-**Released:** 2025-09-07T05:07:14Z  
+**Released:** 2025-09-07T05:58:07Z  
 **From Dev Repo:** [sebastienlepoder/cocktail-machine](https://github.com/sebastienlepoder/cocktail-machine)
 
 ## 🚀 For Pi Users
@@ -23,7 +23,7 @@ sudo /opt/scripts/update_dashboard.sh
 
 ## 📋 Release Notes
 
-Fix Next.js static export handling - should resolve dashboard index.html issues
+Fix kiosk black screen - proper X11 authorization and browser startup
 
 ## 🔄 Update Methods
 
@@ -35,7 +35,7 @@ Fix Next.js static export handling - should resolve dashboard index.html issues
 
 ## 📦 Contents
 
-- **`web/`** - Dashboard application (version v2025.09.07-patch-8ff820c)
+- **`web/`** - Dashboard application (version v2025.09.07-patch-90ccdf3)
 - **`scripts/`** - Installation and update scripts  
 - **`kiosk/`** - Kiosk mode configuration
 - **`web.tar.gz`** - Compressed deployment archive
@@ -43,4 +43,4 @@ Fix Next.js static export handling - should resolve dashboard index.html issues
 ---
 
 *🤖 Automatically deployed from dev repository via GitHub Actions*  
-*⏰ Last updated: 2025-09-07T05:07:14Z*
+*⏰ Last updated: 2025-09-07T05:58:07Z*

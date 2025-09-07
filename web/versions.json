@@ -1,11 +1,11 @@
 {
   "dashboard": {
-    "latest": "v2025.09.07-patch-8ff820c",
+    "latest": "v2025.09.07-patch-90ccdf3",
     "artifact": "web.tar.gz",
     "notes": [
-      "Fix Next.js static export handling - should resolve dashboard index.html issues",
-      "Released on 2025-09-07T05:07:14Z",
-      "Built from dev commit 8ff820c",
+      "Fix kiosk black screen - proper X11 authorization and browser startup",
+      "Released on 2025-09-07T05:58:07Z",
+      "Built from dev commit 90ccdf3",
       "Release type: patch"
     ]
   },
@@ -27,8 +27,8 @@
   },
   "release": {
     "type": "patch",
-    "timestamp": "2025-09-07T05:07:14Z",
+    "timestamp": "2025-09-07T05:58:07Z",
     "dev_repo": "sebastienlepoder/cocktail-machine",
-    "dev_commit": "8ff820c084d1becc235866904aaf736dfd816eae"
+    "dev_commit": "90ccdf3ec04aa50d1ea0be1ac1280a4ef1961160"
   }
 }
