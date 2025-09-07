@@ -1,34 +1,25 @@
 {
   "dashboard": {
-    "latest": "v2025.09.07-0342-aea5624",
+    "latest": "v2025.09.07-7bc487c",
     "artifact": "web.tar.gz",
     "notes": [
-      "🎉 COMPLETE SYSTEM WORKING! Fixed all Pi kiosk and update issues. React dashboard displays correctly on Pi screen, update system works with Docker containers, service health checks fixed. All deployment scripts updated and tested.",
-      "Released on 2025-09-07T03:42:04Z",
-      "Built from dev commit aea5624",
-      "Release type: minor"
+      "Updated dashboard from commit 7bc487c",
+      "Built on 2025-09-07T04:02:50Z",
+      "Latest features and improvements"
     ]
   },
   "modules": {
     "latest": "v1.0.0",
     "notes": [
-      "ESP32 bottle module firmware",
-      "MQTT communication protocol",
-      "Pump control and liquid level sensing"
+      "Stable bottle module firmware",
+      "MQTT communication protocol"
     ]
   },
   "backend": {
     "latest": "v1.0.0", 
     "notes": [
       "Node-RED cocktail control flow",
-      "MQTT broker and dashboard API",
-      "Module management system"
+      "MQTT broker and dashboard API"
     ]
-  },
-  "release": {
-    "type": "minor",
-    "timestamp": "2025-09-07T03:42:04Z",
-    "dev_repo": "sebastienlepoder/cocktail-machine",
-    "dev_commit": "aea5624f5035cd1ff7648d2c613f334faf11cacf"
   }
 }

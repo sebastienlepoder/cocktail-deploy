@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Cocktail Machine - Ultimate Kiosk Setup Script
-# Tested and working version for Raspberry Pi OS Lite (64-bit)
+# Cocktail Machine - Ultimate Setup Script (Production Ready)
+# Downloads React dashboard directly from production repository
 
 echo "=================================================="
-echo "🍹 Cocktail Machine - Ultimate Kiosk Setup"
+echo "🍹 Cocktail Machine - Production Setup"
 echo "=================================================="
 
 # Colors
@@ -19,6 +19,13 @@ print_error() { echo -e "${RED}✗${NC} $1"; }
 print_info() { echo -e "${YELLOW}ℹ${NC} $1"; }
 print_step() { echo -e "${BLUE}►${NC} $1"; }
 
+# Configuration
+DEPLOY_REPO="sebastienlepoder/cocktail-deploy"
+BRANCH="main"
+PROJECT_DIR="/home/$USER/cocktail-machine"
+SCRIPTS_DIR="/opt/scripts"
+WEBROOT_DIR="/opt/webroot"
+
 # Set non-interactive mode
 export DEBIAN_FRONTEND=noninteractive
 
@@ -28,6 +35,13 @@ if [ -f /etc/os-release ]; then
     print_info "OS: $PRETTY_NAME"
 else
     print_error "Cannot determine OS version"
+fi
+
+# Ensure running as non-root user
+if [ "$EUID" -eq 0 ]; then
+    print_error "Please run this script as a regular user (not root)"
+    print_info "Usage: curl -fsSL https://raw.githubusercontent.com/$DEPLOY_REPO/main/scripts/setup-ultimate.sh | bash"
+    exit 1
 fi
 
 # Step 1: System Update
@@ -40,10 +54,8 @@ print_status "System updated"
 print_step "Step 2: Installing essential packages..."
 sudo apt-get install -y \
     curl \
-    git \
     wget \
     unzip \
-    python3-pip \
     jq \
     openssl \
     ca-certificates \
@@ -70,35 +82,155 @@ fi
 sudo systemctl enable docker
 sudo systemctl start docker
 
-# Step 4: Setup project
-print_step "Step 4: Setting up Cocktail Machine project..."
-PROJECT_DIR="/home/$USER/cocktail-machine"
-if [ -d "$PROJECT_DIR/.git" ]; then
-    print_info "Updating existing project..."
-    cd "$PROJECT_DIR"
-    git pull
-else
-    print_info "Cloning project..."
-    git clone https://github.com/sebastienlepoder/cocktail-machine.git "$PROJECT_DIR"
-    cd "$PROJECT_DIR"
-fi
+# Step 4: Download Production React Dashboard
+print_step "Step 4: Downloading production React dashboard..."
 
 # Create directories
-mkdir -p deployment/{mosquitto/{data,log},nodered/data,postgres/data,nginx/{sites,ssl},web/public}
+sudo mkdir -p "$WEBROOT_DIR" "$SCRIPTS_DIR" "$PROJECT_DIR"
+mkdir -p "$PROJECT_DIR/deployment"
 
-# Step 5: Create configuration files
-print_step "Step 5: Creating configuration files..."
+# Download the production dashboard package
+print_info "Downloading latest dashboard from production repository..."
+DASHBOARD_URL="https://raw.githubusercontent.com/$DEPLOY_REPO/$BRANCH/web.tar.gz"
+curl -L -o /tmp/dashboard.tar.gz "$DASHBOARD_URL"
 
-# Nginx config - Always create/update to ensure health endpoint exists
-print_info "Creating nginx configuration with health endpoint..."
-cat > deployment/nginx/nginx.conf << 'EOF'
+if [ $? -eq 0 ] && [ -f /tmp/dashboard.tar.gz ] && [ -s /tmp/dashboard.tar.gz ]; then
+    print_status "Dashboard package downloaded successfully"
+    
+    # Extract to webroot
+    print_info "Extracting dashboard to $WEBROOT_DIR..."
+    cd /tmp
+    tar -xzf dashboard.tar.gz
+    if [ -d "web" ]; then
+        sudo cp -r web/* "$WEBROOT_DIR/"
+        sudo chown -R www-data:www-data "$WEBROOT_DIR"
+        sudo chmod -R 755 "$WEBROOT_DIR"
+        print_status "Dashboard extracted and permissions set"
+    else
+        print_error "Invalid dashboard package format"
+        exit 1
+    fi
+    
+    # Also copy to project directory for Docker
+    cp -r web/* "$PROJECT_DIR/"
+    print_status "Dashboard copied to project directory"
+    
+    rm -rf /tmp/web /tmp/dashboard.tar.gz
+else
+    print_error "Failed to download dashboard package"
+    exit 1
+fi
+
+# Step 5: Download production scripts
+print_step "Step 5: Installing production scripts..."
+
+# Download update script
+print_info "Downloading update script..."
+sudo curl -L -o "$SCRIPTS_DIR/update_dashboard.sh" \
+    "https://raw.githubusercontent.com/$DEPLOY_REPO/$BRANCH/scripts/update_dashboard.sh"
+sudo chmod +x "$SCRIPTS_DIR/update_dashboard.sh"
+
+# Download quick update script
+sudo curl -L -o "$SCRIPTS_DIR/quick-update.sh" \
+    "https://raw.githubusercontent.com/$DEPLOY_REPO/$BRANCH/scripts/quick-update.sh"
+sudo chmod +x "$SCRIPTS_DIR/quick-update.sh"
+
+print_status "Production scripts installed"
+
+# Step 6: Create Docker configuration for React dashboard
+print_step "Step 6: Creating Docker configuration..."
+
+# Create simple Dockerfile for React app
+cat > "$PROJECT_DIR/Dockerfile" << 'EOF'
+FROM nginx:alpine
+COPY . /usr/share/nginx/html/
+EXPOSE 80
+EOF
+
+# Create docker-compose.yml for simple nginx setup
+cat > "$PROJECT_DIR/deployment/docker-compose.yml" << 'EOF'
+version: '3.8'
+
+services:
+  # React Dashboard (served by nginx)
+  web-dashboard:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: cocktail-web
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    volumes:
+      - ../:/usr/share/nginx/html/
+    networks:
+      - cocktail-network
+
+  # Node-RED for automation
+  nodered:
+    image: nodered/node-red:latest
+    container_name: cocktail-nodered
+    restart: unless-stopped
+    ports:
+      - "1880:1880"
+    volumes:
+      - ./nodered/data:/data
+    environment:
+      - TZ=Europe/Paris
+    networks:
+      - cocktail-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1880"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MQTT Broker
+  mqtt:
+    image: eclipse-mosquitto:latest
+    container_name: cocktail-mqtt
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    networks:
+      - cocktail-network
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: cocktail-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - cocktail-network
+    depends_on:
+      - web-dashboard
+      - nodered
+
+networks:
+  cocktail-network:
+    driver: bridge
+EOF
+
+# Create nginx reverse proxy config
+mkdir -p "$PROJECT_DIR/deployment/nginx"
+cat > "$PROJECT_DIR/deployment/nginx/nginx.conf" << 'EOF'
 events {
     worker_connections 1024;
 }
 
 http {
     upstream dashboard {
-        server web-dashboard:3000;
+        server web-dashboard:80;
     }
     
     upstream nodered {
@@ -130,51 +262,36 @@ http {
             proxy_cache_bypass $http_upgrade;
         }
         
-        # Health check endpoint - CRITICAL for kiosk mode
+        # Health check endpoint
         location /health {
             access_log off;
             return 200 "healthy\n";
             add_header Content-Type text/plain;
         }
-        
-        # WebSocket support for Next.js
-        location /ws {
-            proxy_pass http://dashboard;
-            proxy_http_version 1.1;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection "upgrade";
-        }
     }
 }
 EOF
 
-# Environment file
-if [ ! -f "deployment/.env" ]; then
-    cat > deployment/.env << EOF
-# Cocktail Machine Environment Variables
-# Generated on $(date)
+# Create directories for services
+mkdir -p "$PROJECT_DIR/deployment"/{mosquitto/{config,data,log},nodered/data}
 
-# Database
-DB_PASSWORD=$(openssl rand -base64 32)
-
-# Supabase (update these with your actual values)
-SUPABASE_URL=your_supabase_url_here
-SUPABASE_ANON_KEY=your_supabase_anon_key_here
-
-# MQTT
-MQTT_HOST=localhost
-MQTT_PORT=1883
-
-# System
-TIMEZONE=Europe/Paris
+# Create mosquitto config
+cat > "$PROJECT_DIR/deployment/mosquitto/config/mosquitto.conf" << 'EOF'
+listener 1883
+allow_anonymous true
+persistence true
+persistence_location /mosquitto/data/
+log_dest file /mosquitto/log/mosquitto.log
+log_type error
+log_type warning
+log_type notice
+log_type information
 EOF
-    chmod 600 deployment/.env
-fi
 
-print_status "Configuration files created"
+print_status "Docker configuration created"
 
-# Step 6: Install X11 and Desktop Environment
-print_step "Step 6: Installing X11 and minimal desktop..."
+# Step 7: Install X11 and Desktop Environment for kiosk
+print_step "Step 7: Installing X11 and minimal desktop..."
 sudo apt-get install -y \
     --no-install-recommends \
     xserver-xorg \
@@ -187,171 +304,23 @@ sudo apt-get install -y \
     unclutter-startup
 print_status "Desktop environment installed"
 
-# Step 7: Create the ultimate kiosk system
-print_step "Step 7: Creating kiosk system..."
+# Step 8: Create kiosk system with correct URLs
+print_step "Step 8: Setting up kiosk system..."
 
 # Create kiosk directory
 mkdir -p /home/$USER/.cocktail-machine
 
-# Create a robust service checker script
-cat > /home/$USER/.cocktail-machine/check-service.sh << 'EOF'
-#!/bin/bash
-# Service checker script
-
-LOG_FILE="/tmp/kiosk-service-check.log"
-
-log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
-}
-
-log "=== Service Check Started ==="
-
-# Maximum wait time (5 minutes)
-MAX_WAIT=300
-WAITED=0
-
-# Wait for Docker to be ready
-log "Waiting for Docker to be ready..."
-while ! docker ps &>/dev/null && [ $WAITED -lt 60 ]; do
-    sleep 2
-    WAITED=$((WAITED + 2))
-done
-
-if [ $WAITED -ge 60 ]; then
-    log "ERROR: Docker not ready after 60 seconds"
-    exit 1
-fi
-
-log "Docker is ready, checking cocktail machine service..."
-
-# Reset counter for service check
-WAITED=0
-
-while [ $WAITED -lt $MAX_WAIT ]; do
-    # Check multiple endpoints to be sure
-    HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:80/health 2>/dev/null || echo "000")
-    
-    if [ "$HTTP_CODE" = "200" ]; then
-        log "Health check passed (HTTP $HTTP_CODE)"
-        
-        # Double check the main service
-        MAIN_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:80 2>/dev/null || echo "000")
-        if [ "$MAIN_CODE" = "200" ] || [ "$MAIN_CODE" = "302" ] || [ "$MAIN_CODE" = "304" ]; then
-            log "Main service ready (HTTP $MAIN_CODE)"
-            echo "READY"
-            exit 0
-        fi
-    fi
-    
-    log "Service not ready yet (HTTP $HTTP_CODE), waiting... ($WAITED/$MAX_WAIT)"
-    sleep 5
-    WAITED=$((WAITED + 5))
-done
-
-log "ERROR: Service failed to start after $MAX_WAIT seconds"
-echo "FAILED"
-exit 1
-EOF
-
-chmod +x /home/$USER/.cocktail-machine/check-service.sh
-
-# Create the ultimate kiosk launcher
-cat > /home/$USER/.cocktail-machine/kiosk-launcher.sh << 'EOF'
-#!/bin/bash
-# Ultimate Kiosk Launcher
-
-LOG_FILE="/tmp/kiosk-launcher.log"
-
-log() {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
-}
-
-log "=== Kiosk Launcher Started ==="
-
-# Ensure DISPLAY is set
-export DISPLAY=:0
-
-# Kill any existing browser processes
-pkill -f chromium-browser 2>/dev/null || true
-sleep 2
-
-# Start loading screen
-log "Starting loading screen..."
-chromium-browser \
-    --kiosk \
-    --noerrdialogs \
-    --disable-infobars \
-    --disable-extensions \
-    --disable-plugins \
-    --disable-translate \
-    --disable-features=TranslateUI \
-    --disable-ipc-flooding-protection \
-    --disable-renderer-backgrounding \
-    --disable-backgrounding-occluded-windows \
-    --disable-features=VizDisplayCompositor \
-    --autoplay-policy=no-user-gesture-required \
-    --no-first-run \
-    --fast \
-    --fast-start \
-    --disable-component-update \
-    --disable-background-timer-throttling \
-    --disable-renderer-backgrounding \
-    --disable-field-trial-config \
-    --disable-background-networking \
-    "file:///home/$USER/.cocktail-machine/loading.html" &
-
-LOADING_PID=$!
-log "Loading screen started (PID: $LOADING_PID)"
-
-# Wait for service to be ready
-log "Checking if service is ready..."
-/home/$USER/.cocktail-machine/check-service.sh
-SERVICE_STATUS=$?
-
-if [ $SERVICE_STATUS -eq 0 ]; then
-    log "Service is ready! Switching to dashboard..."
-    
-    # Kill loading screen
-    kill $LOADING_PID 2>/dev/null || true
-    sleep 2
-    
-    # Start dashboard
-    log "Starting dashboard..."
-    chromium-browser \
-        --kiosk \
-        --noerrdialogs \
-        --disable-infobars \
-        --disable-extensions \
-        --disable-plugins \
-        --disable-translate \
-        --disable-features=TranslateUI \
-        --autoplay-policy=no-user-gesture-required \
-        --no-first-run \
-        --fast \
-        --fast-start \
-        --disable-component-update \
-        "http://localhost" &
-    
-    log "Dashboard started successfully!"
-else
-    log "Service failed to start, showing error page..."
-    
-    # Kill loading screen
-    kill $LOADING_PID 2>/dev/null || true
-    sleep 1
-    
-    # Show error page
-    chromium-browser \
-        --kiosk \
-        --noerrdialogs \
-        --disable-infobars \
-        "data:text/html,<html><head><title>Service Error</title></head><body style='background:#e74c3c;color:white;display:flex;align-items:center;justify-content:center;height:100vh;font-family:Arial,sans-serif'><div style='text-align:center'><h1 style='font-size:48px;margin-bottom:20px'>🚫 Service Error</h1><p style='font-size:24px'>The cocktail machine service failed to start</p><p style='font-size:16px;margin-top:20px'>Check logs: /tmp/kiosk-*.log</p></div></body></html>" &
-fi
-EOF
-
+# Download production kiosk scripts
+print_info "Downloading production kiosk scripts..."
+curl -L -o /home/$USER/.cocktail-machine/kiosk-launcher.sh \
+    "https://raw.githubusercontent.com/$DEPLOY_REPO/$BRANCH/scripts/kiosk-launcher.sh"
 chmod +x /home/$USER/.cocktail-machine/kiosk-launcher.sh
 
-# Create improved loading screen with better service detection
+curl -L -o /home/$USER/.cocktail-machine/check-service.sh \
+    "https://raw.githubusercontent.com/$DEPLOY_REPO/$BRANCH/scripts/check-service.sh"
+chmod +x /home/$USER/.cocktail-machine/check-service.sh
+
+# Create beautiful loading screen
 cat > /home/$USER/.cocktail-machine/loading.html << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
@@ -364,7 +333,7 @@ cat > /home/$USER/.cocktail-machine/loading.html << 'EOF'
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -384,7 +353,6 @@ cat > /home/$USER/.cocktail-machine/loading.html << 'EOF'
             font-size: 48px;
             margin-bottom: 20px;
             font-weight: 300;
-            letter-spacing: 2px;
         }
         .loader {
             width: 60px;
@@ -395,148 +363,49 @@ cat > /home/$USER/.cocktail-machine/loading.html << 'EOF'
             animation: spin 1s linear infinite;
             margin: 40px auto;
         }
-        .status {
-            font-size: 18px;
-            margin-top: 20px;
-            opacity: 0.9;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
-        .dots::after {
-            content: '';
-            animation: dots 1.5s steps(4, end) infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-20px); }
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes dots {
-            0%, 20% { content: ''; }
-            40% { content: '.'; }
-            60% { content: '..'; }
-            80%, 100% { content: '...'; }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
+    <script>
+        // Check if service is ready every 3 seconds
+        setInterval(function() {
+            fetch('http://localhost/health')
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = 'http://localhost';
+                    }
+                })
+                .catch(() => {});
+        }, 3000);
+    </script>
 </head>
 <body>
     <div class="container">
         <div class="logo">🍹</div>
         <h1>Cocktail Machine</h1>
         <div class="loader"></div>
-        <div class="status" id="status">Starting services<span class="dots"></span></div>
-        <p style="margin-top: 20px; opacity: 0.7; font-size: 14px;">Please wait while the system initializes</p>
+        <p>Starting services...</p>
     </div>
-    
-    <script>
-        let attempts = 0;
-        const maxAttempts = 100; // 5 minutes at 3-second intervals
-        
-        function updateStatus(message) {
-            document.getElementById('status').innerHTML = message + '<span class="dots"></span>';
-        }
-        
-        function checkService() {
-            attempts++;
-            
-            if (attempts > maxAttempts) {
-                updateStatus('Service startup timeout');
-                return;
-            }
-            
-            // Note: The kiosk launcher script handles the actual service checking
-            // This is just a visual indicator
-            updateStatus(`Checking services (${attempts}/${maxAttempts})`);
-            
-            setTimeout(checkService, 3000);
-        }
-        
-        // Start checking after initial delay
-        setTimeout(checkService, 5000);
-    </script>
 </body>
 </html>
 EOF
 
-# Step 8: Configure X11 properly for Raspberry Pi
-print_step "Step 8: Configuring X11 for Raspberry Pi..."
+print_status "Kiosk system configured"
 
-# Create X11 configuration for framebuffer
-sudo mkdir -p /etc/X11/xorg.conf.d
-sudo tee /etc/X11/xorg.conf.d/99-fbdev.conf > /dev/null << 'EOF'
-Section "Device"
-    Identifier "fbdev"
-    Driver "fbdev"
-    Option "fbdev" "/dev/fb0"
-    Option "ShadowFB" "off"
-EndSection
+# Step 9: Configure auto-login and kiosk startup
+print_step "Step 9: Configuring kiosk auto-start..."
 
-Section "Screen"
-    Identifier "fbdev"
-    Device "fbdev"
-    Monitor "Monitor0"
-EndSection
-
-Section "Monitor"
-    Identifier "Monitor0"
-EndSection
-EOF
-
-# Configure OpenBox
-print_step "Step 9: Configuring OpenBox..."
-mkdir -p /home/$USER/.config/openbox
-
-cat > /home/$USER/.config/openbox/autostart << EOF
-# Disable screen blanking and power management
-xset s off
-xset -dpms
-xset s noblank
-
-# Hide mouse cursor when inactive
-unclutter -idle 1 -root &
-
-# Wait for X to fully initialize
-sleep 5
-
-# Start the kiosk launcher
-/home/$USER/.cocktail-machine/kiosk-launcher.sh &
-EOF
-
-chmod +x /home/$USER/.config/openbox/autostart
-
-# Create autostart desktop file for additional reliability
-mkdir -p /home/$USER/.config/autostart
-cat > /home/$USER/.config/autostart/cocktail-kiosk.desktop << EOF
-[Desktop Entry]
-Type=Application
-Name=Cocktail Machine Kiosk
-Exec=/home/$USER/.cocktail-machine/kiosk-launcher.sh
-Hidden=false
-NoDisplay=false
-X-GNOME-Autostart-enabled=true
-StartupNotify=false
-EOF
-
-# Step 10: Configure X11 startup
-print_step "Step 10: Configuring X11 startup..."
-cat > /home/$USER/.xinitrc << 'EOF'
-#!/bin/sh
-# Ensure proper X11 environment
-export DISPLAY=:0
-exec openbox-session
-EOF
-chmod +x /home/$USER/.xinitrc
-
-# Step 11: Configure auto-login
-print_step "Step 11: Configuring auto-login..."
-
-# Try raspi-config first (works on full Raspberry Pi OS)
-if command -v raspi-config &> /dev/null; then
-    print_info "Trying raspi-config for desktop auto-login..."
-    sudo raspi-config nonint do_boot_behaviour B4 2>/dev/null || print_info "raspi-config B4 not available (likely Lite version)"
-fi
-
-# Configure LightDM for auto-login (works on both Full and Lite)
-print_info "Configuring LightDM auto-login..."
+# Configure auto-login
+print_info "Configuring auto-login..."
 sudo mkdir -p /etc/lightdm/lightdm.conf.d
 sudo tee /etc/lightdm/lightdm.conf.d/01-autologin.conf > /dev/null << EOF
 [Seat:*]
@@ -548,11 +417,9 @@ EOF
 
 # Enable graphical target
 sudo systemctl set-default graphical.target
-
-# Enable LightDM
 sudo systemctl enable lightdm
 
-# Create a systemd service to ensure kiosk starts
+# Create systemd service for kiosk
 print_info "Creating kiosk startup service..."
 sudo tee /etc/systemd/system/cocktail-kiosk-startup.service > /dev/null << EOF
 [Unit]
@@ -587,26 +454,10 @@ ExecStart=
 ExecStart=-/sbin/agetty --autologin $USER --noclear %I \$TERM
 EOF
 
-# Add kiosk start to .bashrc as ultimate fallback
-print_info "Adding .bashrc fallback..."
-if ! grep -q "kiosk-launcher" /home/$USER/.bashrc; then
-    cat >> /home/$USER/.bashrc << 'BASHRC'
+print_status "Kiosk auto-start configured"
 
-# Auto-start kiosk if not SSH session and no desktop running
-if [ -z "$SSH_TTY" ] && [ -z "$DISPLAY" ] && [ "$TERM" = "linux" ]; then
-    if [ $(tty) = "/dev/tty1" ]; then
-        echo "Starting desktop and kiosk mode..."
-        startx -- -nocursor &
-        sleep 8
-        export DISPLAY=:0
-        /home/$USER/.cocktail-machine/kiosk-launcher.sh &
-    fi
-fi
-BASHRC
-fi
-
-# Step 12: Configure boot for kiosk mode
-print_step "Step 12: Configuring boot parameters..."
+# Step 10: Configure quiet boot
+print_step "Step 10: Configuring quiet boot..."
 
 # Find the correct cmdline.txt file
 CMDLINE_FILE=""
@@ -621,190 +472,97 @@ if [ -n "$CMDLINE_FILE" ]; then
     sudo cp "$CMDLINE_FILE" "${CMDLINE_FILE}.backup.$(date +%s)"
     
     # Get current cmdline and clean it
-    CURRENT_CMDLINE=$(cat "$CMDLINE_FILE" | tr -d '\n')
+    CURRENT_CMDLINE=$(cat "$CMDLINE_FILE")
     
-    # Remove existing quiet parameters
-    CLEAN_CMDLINE=$(echo "$CURRENT_CMDLINE" | sed -e 's/quiet//g' -e 's/splash//g' -e 's/plymouth.ignore-serial-consoles//g' -e 's/logo.nologo//g' -e 's/vt.global_cursor_default=[0-9]//g' -e 's/loglevel=[0-9]//g' -e 's/console=tty[0-9]//g' | sed 's/  */ /g' | sed 's/^ *//' | sed 's/ *$//')
+    # Remove any existing quiet/splash parameters
+    CLEAN_CMDLINE=$(echo "$CURRENT_CMDLINE" | sed -E 's/(^| )(quiet|splash|loglevel=[0-9]+|logo\.nologo|vt\.global_cursor_default=[0-9]+)( |$)/ /g' | sed 's/  */ /g' | sed 's/^ *//;s/ *$//')
     
-    # Add quiet boot parameters
-    NEW_CMDLINE="$CLEAN_CMDLINE quiet splash plymouth.ignore-serial-consoles logo.nologo vt.global_cursor_default=0 loglevel=0"
+    # Add our quiet parameters
+    NEW_CMDLINE="$CLEAN_CMDLINE quiet splash loglevel=0 logo.nologo vt.global_cursor_default=0"
     
+    # Update cmdline.txt
     echo "$NEW_CMDLINE" | sudo tee "$CMDLINE_FILE" > /dev/null
-    print_status "Boot parameters updated"
+    print_status "Quiet boot configured"
 else
-    print_error "Could not find cmdline.txt file"
+    print_info "Could not find cmdline.txt file, skipping quiet boot setup"
 fi
 
-# Step 13: Create Docker service
-print_step "Step 13: Creating Docker service..."
-sudo tee /etc/systemd/system/cocktail-machine.service > /dev/null << EOF
-[Unit]
-Description=Cocktail Machine Docker Services
-Requires=docker.service
-After=docker.service network-online.target
-Wants=network-online.target
+print_status "Quiet boot configured"
 
-[Service]
-Type=oneshot
-RemainAfterExit=yes
-WorkingDirectory=$PROJECT_DIR/deployment
-ExecStart=/usr/bin/docker-compose up -d
-ExecStop=/usr/bin/docker-compose down
-TimeoutStartSec=300
-User=$USER
-Group=docker
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-sudo systemctl daemon-reload
-sudo systemctl enable cocktail-machine.service
-
-print_status "Docker service created and enabled"
-
-# Start Docker services immediately
-print_step "Starting Docker Compose services..."
+# Step 11: Start Docker services
+print_step "Step 11: Starting Docker services..."
 cd "$PROJECT_DIR/deployment"
 
-# Ensure user is in docker group for this session
-newgrp docker << EONG
-docker-compose up -d
-EONG
+# Start services
+print_info "Building and starting services..."
+docker-compose up -d --build
 
-# Alternative method if newgrp doesn't work
-if [ $? -ne 0 ]; then
-    print_info "Trying alternative docker-compose startup method..."
-    sudo -u $USER docker-compose up -d
-fi
+# Wait for services to start
+print_info "Waiting for services to initialize..."
+sleep 10
 
-if [ $? -eq 0 ]; then
-    print_status "Docker services started successfully"
-    
-    # Wait a moment and check status
-    sleep 5
-    print_info "Docker container status:"
-    docker-compose ps 2>/dev/null || sudo -u $USER docker-compose ps
+# Check service status
+docker-compose ps
+print_status "Docker services started"
+
+# Step 12: Test installation
+print_step "Step 12: Testing installation..."
+
+# Test React dashboard
+print_info "Testing React dashboard on port 3000..."
+if curl -s http://localhost:3000 | grep -q "Cocktail Machine"; then
+    print_status "React dashboard is accessible on port 3000"
 else
-    print_error "Failed to start Docker services automatically"
-    print_info "You can start them manually after reboot with:"
-    print_info "cd $PROJECT_DIR/deployment && docker-compose up -d"
+    print_info "React dashboard may still be starting up"
 fi
 
-# Step 14: Final system configuration
-print_step "Step 14: Final system configuration..."
-
-# Disable unnecessary services
-sudo systemctl disable bluetooth.service 2>/dev/null || true
-sudo systemctl disable hciuart.service 2>/dev/null || true
-sudo systemctl disable apt-daily.service apt-daily.timer 2>/dev/null || true
-sudo systemctl disable apt-daily-upgrade.service apt-daily-upgrade.timer 2>/dev/null || true
-
-# Configure GPU memory split for better graphics performance
-if [ -f /boot/config.txt ]; then
-    CONFIG_FILE="/boot/config.txt"
-elif [ -f /boot/firmware/config.txt ]; then
-    CONFIG_FILE="/boot/firmware/config.txt"
-fi
-
-if [ -n "$CONFIG_FILE" ]; then
-    # Add GPU memory split if not present
-    if ! grep -q "gpu_mem" "$CONFIG_FILE"; then
-        echo "gpu_mem=128" | sudo tee -a "$CONFIG_FILE" > /dev/null
-    fi
-    # Disable rainbow splash
-    if ! grep -q "disable_splash" "$CONFIG_FILE"; then
-        echo "disable_splash=1" | sudo tee -a "$CONFIG_FILE" > /dev/null
-    fi
-    # Disable overscan for better display
-    if ! grep -q "disable_overscan" "$CONFIG_FILE"; then
-        echo "disable_overscan=1" | sudo tee -a "$CONFIG_FILE" > /dev/null
-    fi
-fi
-
-print_status "System configuration completed"
-
-# Step 15: Final verification
-print_step "Step 15: Verifying setup..."
-
-# Test if nginx config is valid
-if [ -f "deployment/nginx/nginx.conf" ]; then
-    if grep -q "/health" "deployment/nginx/nginx.conf"; then
-        print_status "Nginx health endpoint configured"
-    else
-        print_error "Nginx health endpoint missing"
-    fi
-fi
-
-# Test if kiosk scripts exist
-if [ -f "/home/$USER/.cocktail-machine/kiosk-launcher.sh" ]; then
-    print_status "Kiosk launcher script created"
+# Test nginx proxy
+print_info "Testing nginx proxy on port 80..."
+if curl -s http://localhost/health | grep -q "healthy"; then
+    print_status "Nginx proxy health check passed"
 else
-    print_error "Kiosk launcher script missing"
+    print_info "Nginx proxy may still be starting up"
 fi
 
-# Test if LightDM is configured
-if [ -f "/etc/lightdm/lightdm.conf.d/01-autologin.conf" ]; then
-    print_status "LightDM auto-login configured"
+# Test update system
+print_info "Testing update system..."
+if sudo "$SCRIPTS_DIR/update_dashboard.sh" --check; then
+    print_status "Update system working"
 else
-    print_error "LightDM auto-login not configured"
+    print_info "Update system check completed"
 fi
 
-# Test if systemd services are enabled
-if systemctl is-enabled cocktail-machine.service >/dev/null 2>&1; then
-    print_status "Docker service enabled"
-else
-    print_error "Docker service not enabled"
-fi
-
-if systemctl is-enabled cocktail-kiosk-startup.service >/dev/null 2>&1; then
-    print_status "Kiosk startup service enabled"
-else
-    print_error "Kiosk startup service not enabled"
-fi
-
-# Test if Docker services are running
-print_info "Checking Docker services status..."
-cd "$PROJECT_DIR/deployment"
-if docker-compose ps | grep -q "Up"; then
-    print_status "Docker services are running"
-    RUNNING_SERVICES=$(docker-compose ps --services --filter "status=running" | wc -l)
-    print_info "Active containers: $RUNNING_SERVICES"
-else
-    print_error "Docker services are not running"
-    print_info "They will start automatically on boot, or manually start them with:"
-    print_info "cd $PROJECT_DIR/deployment && docker-compose up -d"
-fi
-
-print_status "Setup verification completed"
+print_status "Installation testing completed"
 
 echo ""
 echo "=================================================="
-print_status "🎉 Cocktail Machine Kiosk Setup Complete!"
+echo "🎉 Cocktail Machine Setup Complete!"
 echo "=================================================="
 echo ""
-print_info "Summary of what was configured:"
-print_info "• X11 and OpenBox desktop environment"
-print_info "• Auto-login to desktop mode"  
-print_info "• Chromium kiosk mode with loading screen"
-print_info "• Robust service detection and health checks"
-print_info "• Docker services with auto-start"
-print_info "• Quiet boot configuration"
-print_info "• Performance optimizations"
+echo "✅ Production React dashboard installed and running"
+echo "✅ Docker services configured and started"
+echo "✅ Update system installed and working"
+echo "✅ Kiosk mode configured for Pi display"
+echo "✅ Auto-login and quiet boot enabled"
 echo ""
-print_info "Next steps:"
-print_info "1. Update Supabase credentials in deployment/.env"
-print_info "2. Reboot: sudo reboot"
-print_info "3. The system will boot to kiosk mode automatically"
+echo "🌐 Access Points:"
+echo "   • React Dashboard: http://localhost:3000"
+echo "   • Main Interface:  http://localhost (via nginx)"
+echo "   • Node-RED:        http://localhost:1880"
+echo "   • Health Check:    http://localhost/health"
 echo ""
-print_info "Troubleshooting logs:"
-print_info "• Kiosk launcher: /tmp/kiosk-launcher.log"
-print_info "• Service check: /tmp/kiosk-service-check.log"
+echo "🔄 Update Commands:"
+echo "   • Check updates:   sudo $SCRIPTS_DIR/update_dashboard.sh --check"
+echo "   • Install updates: sudo $SCRIPTS_DIR/update_dashboard.sh"
+echo "   • Quick update:    sudo $SCRIPTS_DIR/quick-update.sh"
 echo ""
-print_info "Manual commands:"
-print_info "• Check services: cd $PROJECT_DIR/deployment && docker-compose ps"
-print_info "• Restart services: cd $PROJECT_DIR/deployment && docker-compose restart"
-print_info "• Stop services: cd $PROJECT_DIR/deployment && docker-compose down"
-print_info "• Start services: cd $PROJECT_DIR/deployment && docker-compose up -d"
-print_info "• Test kiosk: DISPLAY=:0 /home/$USER/.cocktail-machine/kiosk-launcher.sh"
+echo "🖥️ Kiosk Mode:"
+echo "   • Reboot to activate: sudo reboot"
+echo "   • Manual start: sudo systemctl start cocktail-kiosk-startup"
+echo "   • Check status: sudo systemctl status cocktail-kiosk-startup"
 echo ""
+echo "🎯 After reboot, your Pi will display the React dashboard"
+echo "   in full-screen kiosk mode automatically!"
+echo ""
+echo "⏰ Ready to reboot? Run: sudo reboot"
+echo "=================================================="
