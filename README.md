@@ -1,8 +1,8 @@
 # 🍹 Cocktail Machine - Production Release
 
-**Latest Version:** `v2025.09.07-patch-bf2965c`  
+**Latest Version:** `v2025.09.07-patch-489d1f6`  
 **Release Type:** patch  
-**Released:** 2025-09-07T06:08:05Z  
+**Released:** 2025-09-07T06:17:18Z  
 **From Dev Repo:** [sebastienlepoder/cocktail-machine](https://github.com/sebastienlepoder/cocktail-machine)
 
 ## 🚀 For Pi Users
@@ -23,7 +23,7 @@ sudo /opt/scripts/update_dashboard.sh
 
 ## 📋 Release Notes
 
-Fix auto-login and desktop session - should resolve X11 authorization and kiosk startup
+CRITICAL FIX: Resolve X11 framebuffer driver conflicts - should fix the fatal server error
 
 ## 🔄 Update Methods
 
@@ -35,7 +35,7 @@ Fix auto-login and desktop session - should resolve X11 authorization and kiosk 
 
 ## 📦 Contents
 
-- **`web/`** - Dashboard application (version v2025.09.07-patch-bf2965c)
+- **`web/`** - Dashboard application (version v2025.09.07-patch-489d1f6)
 - **`scripts/`** - Installation and update scripts  
 - **`kiosk/`** - Kiosk mode configuration
 - **`web.tar.gz`** - Compressed deployment archive
@@ -43,4 +43,4 @@ Fix auto-login and desktop session - should resolve X11 authorization and kiosk 
 ---
 
 *🤖 Automatically deployed from dev repository via GitHub Actions*  
-*⏰ Last updated: 2025-09-07T06:08:05Z*
+*⏰ Last updated: 2025-09-07T06:17:18Z*

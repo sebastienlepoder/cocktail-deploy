@@ -1,11 +1,11 @@
 {
   "dashboard": {
-    "latest": "v2025.09.07-patch-bf2965c",
+    "latest": "v2025.09.07-patch-489d1f6",
     "artifact": "web.tar.gz",
     "notes": [
-      "Fix auto-login and desktop session - should resolve X11 authorization and kiosk startup",
-      "Released on 2025-09-07T06:08:05Z",
-      "Built from dev commit bf2965c",
+      "CRITICAL FIX: Resolve X11 framebuffer driver conflicts - should fix the fatal server error",
+      "Released on 2025-09-07T06:17:18Z",
+      "Built from dev commit 489d1f6",
       "Release type: patch"
     ]
   },
@@ -27,8 +27,8 @@
   },
   "release": {
     "type": "patch",
-    "timestamp": "2025-09-07T06:08:05Z",
+    "timestamp": "2025-09-07T06:17:18Z",
     "dev_repo": "sebastienlepoder/cocktail-machine",
-    "dev_commit": "bf2965cbd420b578de1168a49cb3b7e61f3993a3"
+    "dev_commit": "489d1f655623a600b270a4d7c1a2c400b7e13788"
   }
 }
