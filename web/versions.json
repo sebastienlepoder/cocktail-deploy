@@ -1,11 +1,11 @@
 {
   "dashboard": {
-    "latest": "v2025.09.07-patch-489d1f6",
+    "latest": "v2025.09.07-patch-aea4765",
     "artifact": "web.tar.gz",
     "notes": [
-      "CRITICAL FIX: Resolve X11 framebuffer driver conflicts - should fix the fatal server error",
-      "Released on 2025-09-07T06:17:18Z",
-      "Built from dev commit 489d1f6",
+      "Clean deployment with X11 fixes and no workflow conflicts",
+      "Released on 2025-09-07T06:25:10Z",
+      "Built from dev commit aea4765",
       "Release type: patch"
     ]
   },
@@ -27,8 +27,8 @@
   },
   "release": {
     "type": "patch",
-    "timestamp": "2025-09-07T06:17:18Z",
+    "timestamp": "2025-09-07T06:25:10Z",
     "dev_repo": "sebastienlepoder/cocktail-machine",
-    "dev_commit": "489d1f655623a600b270a4d7c1a2c400b7e13788"
+    "dev_commit": "aea4765715e043abf2aa891e30a7346d366d4aa8"
   }
 }

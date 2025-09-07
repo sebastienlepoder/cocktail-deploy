@@ -1,8 +1,8 @@
 # 🍹 Cocktail Machine - Production Release
 
-**Latest Version:** `v2025.09.07-patch-489d1f6`  
+**Latest Version:** `v2025.09.07-patch-aea4765`  
 **Release Type:** patch  
-**Released:** 2025-09-07T06:17:18Z  
+**Released:** 2025-09-07T06:25:10Z  
 **From Dev Repo:** [sebastienlepoder/cocktail-machine](https://github.com/sebastienlepoder/cocktail-machine)
 
 ## 🚀 For Pi Users
@@ -23,7 +23,7 @@ sudo /opt/scripts/update_dashboard.sh
 
 ## 📋 Release Notes
 
-CRITICAL FIX: Resolve X11 framebuffer driver conflicts - should fix the fatal server error
+Clean deployment with X11 fixes and no workflow conflicts
 
 ## 🔄 Update Methods
 
@@ -35,7 +35,7 @@ CRITICAL FIX: Resolve X11 framebuffer driver conflicts - should fix the fatal se
 
 ## 📦 Contents
 
-- **`web/`** - Dashboard application (version v2025.09.07-patch-489d1f6)
+- **`web/`** - Dashboard application (version v2025.09.07-patch-aea4765)
 - **`scripts/`** - Installation and update scripts  
 - **`kiosk/`** - Kiosk mode configuration
 - **`web.tar.gz`** - Compressed deployment archive
@@ -43,4 +43,4 @@ CRITICAL FIX: Resolve X11 framebuffer driver conflicts - should fix the fatal se
 ---
 
 *🤖 Automatically deployed from dev repository via GitHub Actions*  
-*⏰ Last updated: 2025-09-07T06:17:18Z*
+*⏰ Last updated: 2025-09-07T06:25:10Z*
