@@ -1,34 +1,25 @@
 {
   "dashboard": {
-    "latest": "v2025.09.07-patch-86c9a44",
+    "latest": "v2025.09.07-99739ca",
     "artifact": "web.tar.gz",
     "notes": [
-      "🧹 CLEANUP: Removed all outdated setup scripts. Now only ONE setup script exists: setup-ultimate.sh. Updated all documentation. No more confusion about which script to use!",
-      "Released on 2025-09-07T04:13:01Z",
-      "Built from dev commit 86c9a44",
-      "Release type: patch"
+      "Updated dashboard from commit 99739ca",
+      "Built on 2025-09-07T04:21:05Z",
+      "Latest features and improvements"
     ]
   },
   "modules": {
     "latest": "v1.0.0",
     "notes": [
-      "ESP32 bottle module firmware",
-      "MQTT communication protocol",
-      "Pump control and liquid level sensing"
+      "Stable bottle module firmware",
+      "MQTT communication protocol"
     ]
   },
   "backend": {
     "latest": "v1.0.0", 
     "notes": [
       "Node-RED cocktail control flow",
-      "MQTT broker and dashboard API",
-      "Module management system"
+      "MQTT broker and dashboard API"
     ]
-  },
-  "release": {
-    "type": "patch",
-    "timestamp": "2025-09-07T04:13:01Z",
-    "dev_repo": "sebastienlepoder/cocktail-machine",
-    "dev_commit": "86c9a44f089f1f92d83ceb9eafaa324fdfef3ee8"
   }
 }
