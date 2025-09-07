@@ -2,7 +2,7 @@
 
 **Latest Version:** `v2025.09.07-patch-574b7ee`  
 **Release Type:** patch  
-**Released:** 2025-09-07T02:10:20Z  
+**Released:** 2025-09-07T02:38:35Z  
 **From Dev Repo:** [sebastienlepoder/cocktail-machine](https://github.com/sebastienlepoder/cocktail-machine)
 
 ## 🚀 For Pi Users
@@ -23,7 +23,7 @@ sudo /opt/scripts/update_dashboard.sh
 
 ## 📋 Release Notes
 
-Add missing update scripts - fixes Node-RED dashboard update button error
+Latest features and improvements
 
 ## 🔄 Update Methods
 
@@ -43,4 +43,4 @@ Add missing update scripts - fixes Node-RED dashboard update button error
 ---
 
 *🤖 Automatically deployed from dev repository via GitHub Actions*  
-*⏰ Last updated: 2025-09-07T02:10:20Z*
+*⏰ Last updated: 2025-09-07T02:38:35Z*

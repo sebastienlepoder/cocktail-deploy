@@ -3,8 +3,8 @@
     "latest": "v2025.09.07-patch-574b7ee",
     "artifact": "web.tar.gz",
     "notes": [
-      "Add missing update scripts - fixes Node-RED dashboard update button error",
-      "Released on 2025-09-07T02:10:20Z",
+      "Latest features and improvements",
+      "Released on 2025-09-07T02:38:35Z",
       "Built from dev commit 574b7ee",
       "Release type: patch"
     ]
@@ -27,7 +27,7 @@
   },
   "release": {
     "type": "patch",
-    "timestamp": "2025-09-07T02:10:20Z",
+    "timestamp": "2025-09-07T02:38:35Z",
     "dev_repo": "sebastienlepoder/cocktail-machine",
     "dev_commit": "574b7ee0b63b4d257c83f1d857e1ec76a6d22a31"
   }
